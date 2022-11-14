@@ -1,0 +1,40 @@
+---
+- name: TLS create
+  hosts: all
+  gather_facts: false
+  become: true
+  vars:
+    cert_key_path: /home/ubuntu/.tls/
+  tasks:
+    - name: Dir create
+      file:
+        path: /home/ubuntu/.tls
+        state: directory
+        mode: 775
+
+    - name: Create private key (RSA, 4096 bits)
+      community.crypto.openssl_privatekey:
+        path: "{{ cert_key_path }}ssl-cert.key"
+
+    - name: Create simple self-signed certificate
+      community.crypto.x509_certificate:
+        path: "{{ cert_key_path }}ssl-cert.crt"
+        privatekey_path: "{{ cert_key_path }}ssl-cert.key"
+        provider: selfsigned
+
+    - name: Create certificate signing request (CSR) for self-signed certificate
+      community.crypto.openssl_csr_pipe:
+        privatekey_path: "{{ cert_key_path }}ssl-cert.key"
+        common_name: cloudimix.com
+        organization_name: Dimi, Inc.
+        subject_alt_name:
+          - "DNS:cloudimix.com"
+          - "DNS:www.cloudimix.com"
+      register: csr
+
+    - name: Create self-signed certificate from CSR
+      community.crypto.x509_certificate:
+        path: "{{ cert_key_path }}ssl-cert.crt"
+        csr_content: "{{ csr.csr }}"
+        privatekey_path: "{{ cert_key_path }}ssl-cert.key"
+        provider: selfsigned

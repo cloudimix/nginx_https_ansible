@@ -1,0 +1,12 @@
+roles:
+  - name: geerlingguy.firewall
+  - name: geerlingguy.docker
+  - name: geerlingguy.pip
+  - name: geerlingguy.nginx
+  
+collections:
+  - name: ansible.posix
+  - name: community.crypto
+  - name: community.general
+  - name: community.docker
+  - name: devsec.hardening

@@ -1,0 +1,2 @@
+[all]
+nginx_server ansible_host=130.61.106.158 ansible_ssh_user=ubuntu
